@@ -1,0 +1,365 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMcnkVsKvwtq2LLG8jkVZyM",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/yamangakre2007-afks/assisgnment/blob/main/projecttt1.pynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import numpy as np\n",
+        "\n",
+        "np.random.seed(42)  # reproducible results\n",
+        "np.set_printoptions(suppress=True, linewidth=120)"
+      ],
+      "metadata": {
+        "id": "Lcib1SfOdU3q"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "N_STORES, N_MONTHS = 10, 12\n",
+        "\n",
+        "months = np.arange(1, 13)                       # month labels 1..12\n",
+        "month_names = np.array([\"Jan\",\"Feb\",\"Mar\",\"Apr\",\"May\",\"Jun\",\n",
+        "                        \"Jul\",\"Aug\",\"Sep\",\"Oct\",\"Nov\",\"Dec\"])\n",
+        "stores = np.arange(N_STORES)                    # store ids 0..9\n",
+        "\n",
+        "# Random base sales per store/month (in dollars)\n",
+        "sales = np.random.randint(30_000, 90_000, size=(N_STORES, N_MONTHS))\n",
+        "\n",
+        "print(\"months:\", months)\n",
+        "print(\"sales shape:\", sales.shape)\n",
+        "print(sales)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "0KtLStGydVry",
+        "outputId": "e90f4cd3-9fb7-4b54-dbd3-8cf2f9469871"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "months: [ 1  2  3  4  5  6  7  8  9 10 11 12]\n",
+            "sales shape: (10, 12)\n",
+            "[[86422 45795 30860 68158 84343 74732 41284 84886 36265 46850 67194 51962]\n",
+            " [77191 74131 46023 71090 31685 30769 89735 86101 32433 35311 67819 69188]\n",
+            " [47568 83707 49769 58693 36396 57480 71434 55658 48942 87001 48431 32747]\n",
+            " [88319 89150 30189 49118 65773 83810 31899 86886 31267 61551 80680 41394]\n",
+            " [33556 33890 71606 60740 44502 51777 40627 38792 73323 73021 38433 73001]\n",
+            " [41016 53897 32612 86193 88707 85387 84638 53483 88822 78555 89900 47159]\n",
+            " [74974 70994 44541 65920 56531 31585 33943 53939 49457 31021 41653 73573]\n",
+            " [43417 82995 70757 39692 75758 36873 35675 30161 67065 56557 63763 62606]\n",
+            " [41534 59127 70397 55851 31016 54253 85591 54276 53247 54300 38529 47262]\n",
+            " [39268 51271 42185 51243 69099 38571 87836 69976 68044 81214 79216 78984]]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "Q1 = sales[:, 0:3]\n",
+        "Q2 = sales[:, 3:6]\n",
+        "Q3 = sales[:, 6:9]\n",
+        "Q4 = sales[:, 9:12]\n",
+        "\n",
+        "print(\"Q1 shape:\", Q1.shape)\n",
+        "print(\"Q1 total per store:\", Q1.sum(axis=1))\n",
+        "\n",
+        "# Individual stores\n",
+        "store_3 = sales[3, :]          # all months for store 3\n",
+        "print(\"\\nStore 3 full year:\", store_3)\n",
+        "\n",
+        "# A store within a quarter, and a month across all stores\n",
+        "print(\"Store 3, Q2:\", sales[3, 3:6])\n",
+        "print(\"All stores, March:\", sales[:, 2])\n",
+        "\n",
+        "# reshape trick: split 12 months into (4 quarters x 3 months)\n",
+        "by_quarter = sales.reshape(N_STORES, 4, 3)       # (stores, quarter, month-in-quarter)\n",
+        "quarterly_totals = by_quarter.sum(axis=2)        # (10, 4)\n",
+        "print(\"\\nQuarterly totals (stores x Q1..Q4):\")\n",
+        "print(quarterly_totals)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "iLbN3bqodY8Y",
+        "outputId": "0f871eee-eada-4699-cf98-a1ab4e5c8272"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Q1 shape: (10, 3)\n",
+            "Q1 total per store: [163077 197345 181044 207658 139052 127525 190509 197169 171058 132724]\n",
+            "\n",
+            "Store 3 full year: [88319 89150 30189 49118 65773 83810 31899 86886 31267 61551 80680 41394]\n",
+            "Store 3, Q2: [49118 65773 83810]\n",
+            "All stores, March: [30860 46023 49769 30189 71606 32612 44541 70757 70397 42185]\n",
+            "\n",
+            "Quarterly totals (stores x Q1..Q4):\n",
+            "[[163077 227233 162435 166006]\n",
+            " [197345 133544 208269 172318]\n",
+            " [181044 152569 176034 168179]\n",
+            " [207658 198701 150052 183625]\n",
+            " [139052 157019 152742 184455]\n",
+            " [127525 260287 226943 215614]\n",
+            " [190509 154036 137339 146247]\n",
+            " [197169 152323 132901 182926]\n",
+            " [171058 141120 193114 140091]\n",
+            " [132724 158913 225856 239414]]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "TARGET = 60_000\n",
+        "\n",
+        "# Months with sales > target\n",
+        "above_target = sales > TARGET\n",
+        "print(\"Store-months above target:\", above_target.sum(), \"of\", sales.size)\n",
+        "\n",
+        "# Stores below average (average of store totals)\n",
+        "store_totals = sales.sum(axis=1)\n",
+        "below_avg_stores = store_totals < store_totals.mean()\n",
+        "print(\"Stores below average:\", stores[below_avg_stores])\n",
+        "\n",
+        "# --- Combined conditions ---\n",
+        "# AND (&): below-average stores that still beat the target in a month\n",
+        "below_avg_grid = below_avg_stores[:, None]       # (10,1) broadcasts across months\n",
+        "mask_and = above_target & below_avg_grid\n",
+        "print(\"\\nBelow-avg stores hitting target (store, month):\")\n",
+        "for s, m in zip(*np.where(mask_and)):\n",
+        "    print(f\"  Store {s}, {month_names[m]}: ${sales[s, m]:,}\")\n",
+        "\n",
+        "# OR (|): H2 months OR sales over target\n",
+        "h2 = months > 6\n",
+        "mask_or = above_target | h2                      # (10,12) | (12,) broadcasts\n",
+        "print(\"\\nCells matching (above target OR H2):\", mask_or.sum())\n",
+        "\n",
+        "# NOT (~): months that missed target\n",
+        "missed = ~above_target\n",
+        "print(\"Months that missed target:\", missed.sum())\n",
+        "\n",
+        "# Using a mask to pull values out\n",
+        "print(\"\\nFirst 10 sales values over target:\", sales[above_target][:10])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "0_ZfjCKodbUa",
+        "outputId": "60070b99-3741-4d1b-c8a7-81785a9c5c92"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Store-months above target: 54 of 120\n",
+            "Stores below average: [2 4 6 7 8]\n",
+            "\n",
+            "Below-avg stores hitting target (store, month):\n",
+            "  Store 2, Feb: $83,707\n",
+            "  Store 2, Jul: $71,434\n",
+            "  Store 2, Oct: $87,001\n",
+            "  Store 4, Mar: $71,606\n",
+            "  Store 4, Apr: $60,740\n",
+            "  Store 4, Sep: $73,323\n",
+            "  Store 4, Oct: $73,021\n",
+            "  Store 4, Dec: $73,001\n",
+            "  Store 6, Jan: $74,974\n",
+            "  Store 6, Feb: $70,994\n",
+            "  Store 6, Apr: $65,920\n",
+            "  Store 6, Dec: $73,573\n",
+            "  Store 7, Feb: $82,995\n",
+            "  Store 7, Mar: $70,757\n",
+            "  Store 7, May: $75,758\n",
+            "  Store 7, Sep: $67,065\n",
+            "  Store 7, Nov: $63,763\n",
+            "  Store 7, Dec: $62,606\n",
+            "  Store 8, Mar: $70,397\n",
+            "  Store 8, Jul: $85,591\n",
+            "\n",
+            "Cells matching (above target OR H2): 85\n",
+            "Months that missed target: 66\n",
+            "\n",
+            "First 10 sales values over target: [86422 68158 84343 74732 84886 67194 77191 74131 71090 89735]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "picked_stores = [1, 4, 7]\n",
+        "print(\"Stores 1, 4, 7:\")\n",
+        "print(sales[picked_stores])\n",
+        "\n",
+        "# Best 3 months by total sales across all stores\n",
+        "month_totals = sales.sum(axis=0)\n",
+        "best3 = np.argsort(month_totals)[-3:][::-1]      # indices, highest first\n",
+        "print(\"\\nBest 3 months:\", month_names[best3], \"->\", month_totals[best3])\n",
+        "\n",
+        "# Combine: picked stores x best months using np.ix_\n",
+        "print(\"\\nStores [1,4,7] in the best 3 months:\")\n",
+        "print(sales[np.ix_(picked_stores, best3)])\n",
+        "\n",
+        "# Best month for every store (one index per row)\n",
+        "best_month_per_store = sales.argmax(axis=1)\n",
+        "print(\"\\nBest month per store:\", month_names[best_month_per_store])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2bGJwQa3df_7",
+        "outputId": "3c100566-b3c4-4c91-cabd-c5bae4e1fc72"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Stores 1, 4, 7:\n",
+            "[[77191 74131 46023 71090 31685 30769 89735 86101 32433 35311 67819 69188]\n",
+            " [33556 33890 71606 60740 44502 51777 40627 38792 73323 73021 38433 73001]\n",
+            " [43417 82995 70757 39692 75758 36873 35675 30161 67065 56557 63763 62606]]\n",
+            "\n",
+            "Best 3 months: ['Feb' 'Nov' 'Aug'] -> [644957 615618 614158]\n",
+            "\n",
+            "Stores [1,4,7] in the best 3 months:\n",
+            "[[74131 67819 86101]\n",
+            " [33890 38433 38792]\n",
+            " [82995 63763 30161]]\n",
+            "\n",
+            "Best month per store: ['Jan' 'Jul' 'Oct' 'Feb' 'Sep' 'Nov' 'Jan' 'Feb' 'Jul' 'Jul']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "monthly_avg = sales.mean(axis=0)\n",
+        "growth_targets = np.linspace(monthly_avg[0], monthly_avg[0] * 1.20, N_MONTHS)\n",
+        "\n",
+        "print(\"=\" * 62)\n",
+        "print(f\"{'MONTHLY REPORT':^62}\")\n",
+        "print(\"=\" * 62)\n",
+        "print(f\"{'Month':<6}{'Avg Sales':>12}{'Target':>12}{'Gap':>12}  Status\")\n",
+        "for i in range(N_MONTHS):\n",
+        "    gap = monthly_avg[i] - growth_targets[i]\n",
+        "    status = \"HIT\" if gap >= 0 else \"MISS\"\n",
+        "    print(f\"{month_names[i]:<6}{monthly_avg[i]:>12,.0f}{growth_targets[i]:>12,.0f}{gap:>12,.0f}  {status}\")\n",
+        "\n",
+        "print()\n",
+        "print(\"=\" * 62)\n",
+        "print(f\"{'STORE-WISE REPORT':^62}\")\n",
+        "print(\"=\" * 62)\n",
+        "store_avg = sales.mean(axis=1)\n",
+        "company_avg = store_avg.mean()\n",
+        "print(f\"{'Store':<7}{'Total':>12}{'Avg/Mo':>12}{'vs Avg':>10}  Best Month\")\n",
+        "for s in stores:\n",
+        "    diff = (store_avg[s] / company_avg - 1) * 100\n",
+        "    print(f\"{s:<7}{store_totals[s]:>12,}{store_avg[s]:>12,.0f}{diff:>9.1f}%  {month_names[best_month_per_store[s]]}\")\n",
+        "\n",
+        "print()\n",
+        "print(\"=\" * 62)\n",
+        "print(f\"{'QUARTERLY REPORT':^62}\")\n",
+        "print(\"=\" * 62)\n",
+        "q_company = quarterly_totals.sum(axis=0)\n",
+        "for q in range(4):\n",
+        "    top_store = quarterly_totals[:, q].argmax()\n",
+        "    print(f\"Q{q+1}: total ${q_company[q]:>10,} | top store: {top_store} (${quarterly_totals[top_store, q]:,})\")"
+      ],
+      "metadata": {
+        "id": "8sR59PkCdkKk"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def query(sales, min_sales=None, max_sales=None, stores=None, months=None):\n",
+        "    \"\"\"Return (store_idx, month_idx, value) for cells matching ALL given filters.\n",
+        "    months are 1-12, stores are 0-based row ids.\"\"\"\n",
+        "    mask = np.ones_like(sales, dtype=bool)\n",
+        "    if min_sales is not None:\n",
+        "        mask &= sales >= min_sales\n",
+        "    if max_sales is not None:\n",
+        "        mask &= sales <= max_sales\n",
+        "    if stores is not None:\n",
+        "        mask &= np.isin(np.arange(sales.shape[0]), stores)[:, None]\n",
+        "    if months is not None:\n",
+        "        mask &= np.isin(np.arange(1, sales.shape[1] + 1), months)[None, :]\n",
+        "    s_idx, m_idx = np.where(mask)\n",
+        "    return s_idx, m_idx, sales[s_idx, m_idx]\n",
+        "\n",
+        "# Example: stores 1, 4, 7 in Q4 with sales over 70k\n",
+        "s_idx, m_idx, vals = query(sales, min_sales=70_000, stores=[1, 4, 7], months=[10, 11, 12])\n",
+        "print(f\"{len(vals)} matches\")\n",
+        "for s, m, v in zip(s_idx, m_idx, vals):\n",
+        "    print(f\"  Store {s} | {month_names[m]} | ${v:,}\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qVdrl-DkeQLf",
+        "outputId": "65a10497-92bd-477e-9d31-d3795ad747cb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2 matches\n",
+            "  Store 4 | Oct | $73,021\n",
+            "  Store 4 | Dec | $73,001\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
